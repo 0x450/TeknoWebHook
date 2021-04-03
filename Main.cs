@@ -6,8 +6,8 @@ using System.Collections.Generic;
 namespace TeknoHook
 {
 
-	public class Main : BaseScript
-	{
+    public class Main : BaseScript
+    {
         private string WebHookURL = "";//WebhookURL
         private string BotUsername = "TeknoBot Logs";//BotUsername
         private string BotAvatar = "";//BotAvatar
@@ -62,12 +62,22 @@ namespace TeknoHook
                 WebHookURL,
                 BotUsername,
                 BotAvatar,
-                $"PlayerName: {player.Name}   |   Guid: {player.GUID}\nHWID: {player.HWID}   |   IP: {player.IP}\n   Developed by MRX450#6329"
+                "```md\n" +
+                "-\n" +
+                $"                - {player.Name} joined the server\n" +
+                "------------------------------------------------------------------------------\n" +
+                $"- PlayerName: {player.Name}\n" +
+                $"# Guid: {player.GUID}\n" +
+                $"# HWID: {player.HWID}   |   IP: {player.IP}\n" +
+                "------------------------------------------------------------------------------\n" +
+                "                - Developed by MRX450#6329\n" +
+                "-```"
             );
             Entitys.Add(player);
         }
 
-        public override BaseScript.EventEat OnSay2(Entity player, string name, string message){
+        public override BaseScript.EventEat OnSay2(Entity player, string name, string message)
+        {
             string[] Array = message.Split(' ');
 
             string reason = "";
@@ -97,7 +107,7 @@ namespace TeknoHook
                             WebHookURL,
                             BotUsername,
                             BotAvatar,
-                            $"Player **{player.Name}** reported -> **{repoted.Name}** by {reason}"
+                            $"```md\n# Player **{player.Name}** reported -> **{repoted.Name}**  by {reason}```"
                         );
                     }
                 }
