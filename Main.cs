@@ -66,7 +66,7 @@ namespace TeknoHook
                 "-\n" +
                 $"                - {player.Name} joined the server\n" +
                 "------------------------------------------------------------------------------\n" +
-                $"-                         PlayerName: {player.Name}\n" +
+                $"- PlayerName: {player.Name}\n" +
                 $"# Guid: {player.GUID}                  |   IP: {player.IP}\n" +
                 $"# HWID: {player.HWID}   |   Joined at: {DateTime.Now}\n" +
                 "------------------------------------------------------------------------------\n" +
