@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Text;
 using InfinityScript;
 using System.Collections.Generic;
 
@@ -8,14 +10,23 @@ namespace TeknoHook
 
     public class Main : BaseScript
     {
-        private string WebHookURL = "";//WebhookURL
-        private string BotUsername = "TeknoBot Logs";//BotUsername
-        private string BotAvatar = "";//BotAvatar
+        private string file = "scripts\\TeknoWebHook.txt";
+        private List<Entity> Entitys = new List<Entity>();
 
-        public List<Entity> Entitys = new List<Entity>();
         public Main()
         {
             this.PlayerConnected += new Action<Entity>(this.playerConnected);
+            if (!File.Exists(file))
+            {
+                File.Create(file).Close();
+                using (StreamWriter sw = new StreamWriter(file, true, Encoding.UTF8))
+                {
+                    sw.WriteLine("WebHookURL=");
+                    sw.WriteLine("BotUsername=TeknoBot Logs");
+                    sw.WriteLine("BotAvatar=");
+                    sw.WriteLine("SendPJoined=false");
+                }
+            }
         }
 
         Entity FindByName(string name)
@@ -36,48 +47,91 @@ namespace TeknoHook
 
             return null;
         }
-
-        public static void sendWebhook(string WebHook, string BotUsername, string BotAvatar, string msg)
+        public static void sendWebhook(Entity player,string WebHookURL, string BotUsername, string BotAvatar, string msg)
         {
-            Http.Post(WebHook, new System.Collections.Specialized.NameValueCollection()
+            if (WebHookURL == "")
             {
+                Utilities.RawSayTo(player, "- Webhook has not been defined");
+            }
+            else
+            {
+                Http.Post(WebHookURL, new System.Collections.Specialized.NameValueCollection()
                 {
-                    "username",
-                    BotUsername
-                },
-                {
-                    "avatar_url",
-                    BotAvatar
-                },
-                {
-                    "content",
-                    msg
-                }
-            });
+                    {
+                        "username",
+                        BotUsername
+                    },
+                    {
+                        "avatar_url",
+                        BotAvatar
+                    },
+                    {
+                        "content",
+                        msg
+                    }
+                });
+            }
         }
 
         private void playerConnected(Entity player)
         {
-            sendWebhook(
-                WebHookURL,
-                BotUsername,
-                BotAvatar,
-                "```md\n" +
-                "-\n" +
-                $"                - {player.Name} joined the server\n" +
-                "------------------------------------------------------------------------------\n" +
-                $"- PlayerName: {player.Name}\n" +
-                $"# Guid: {player.GUID}                  |   IP: {player.IP}\n" +
-                $"# HWID: {player.HWID}   |   Joined at: {DateTime.Now}\n" +
-                "------------------------------------------------------------------------------\n" +
-                "                - Developed by MRX450#6329\n" +
-                "-```"
-            );
+            string WebHookURL = null;
+            string BotUsername = null;
+            string BotAvatar = null;
+            string SendMsgJoined = null;
+
+            foreach (string str in File.ReadAllLines("scripts\\TeknoWebHook.txt"))
+            {
+                WebHookURL = str.StartsWith("WebHookURL") ? str.Split(new char[1] { '=' })[1] : WebHookURL;
+                BotUsername = str.StartsWith("BotUsername") ? str.Split(new char[1] { '=' })[1] : BotUsername;
+                BotAvatar = str.StartsWith("BotAvatar") ? str.Split(new char[1] { '=' })[1] : BotAvatar;
+                SendMsgJoined = str.StartsWith("SendPJoined") ? str.Split(new char[1] { '=' })[1] : SendMsgJoined;
+            }
+
+            if (SendMsgJoined == "true")
+            {
+                sendWebhook(
+                    player,
+                    WebHookURL,
+                    BotUsername,
+                    BotAvatar,
+                    "```md\n" +
+                    "-\n" +
+                    $"                - {player.Name} joined the server\n" +
+                    "------------------------------------------------------------------------------\n" +
+                    $"-                         PlayerName: {player.Name}\n" +
+                    $"# Guid: {player.GUID}                  |   IP: {player.IP}\n" +
+                    $"# HWID: {player.HWID}   |   Joined at: {DateTime.Now}\n" +
+                    "------------------------------------------------------------------------------\n" +
+                    "                - Developed by MRX450#6329\n" +
+                    "-```"
+               );
+            }
             Entitys.Add(player);
         }
 
         public override BaseScript.EventEat OnSay2(Entity player, string name, string message)
         {
+
+            string WebHookURL = null;
+            string BotUsername = null;
+            string BotAvatar = null;
+
+            foreach (string str in File.ReadAllLines("scripts\\TeknoWebHook.txt"))
+            {
+                WebHookURL = str.StartsWith("WebHookURL") ? str.Split(new char[1] { '=' })[1] : WebHookURL;
+                BotUsername = str.StartsWith("BotUsername") ? str.Split(new char[1] { '=' })[1] : BotUsername;
+                BotAvatar = str.StartsWith("BotAvatar") ? str.Split(new char[1] { '=' })[1] : BotAvatar;
+            }
+
+            sendWebhook(
+                player,
+                WebHookURL,
+                BotUsername,
+                BotAvatar,
+                $"```css\n[{DateTime.Now}] {player.Name}: {message}```"
+            );
+
             string[] Array = message.Split(' ');
 
             string reason = "";
@@ -104,6 +158,7 @@ namespace TeknoHook
                         }
                         Utilities.RawSayTo(player, "Report sent successfully!");
                         sendWebhook(
+                            player,
                             WebHookURL,
                             BotUsername,
                             BotAvatar,
