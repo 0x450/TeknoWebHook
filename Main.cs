@@ -66,9 +66,9 @@ namespace TeknoHook
                 "-\n" +
                 $"                - {player.Name} joined the server\n" +
                 "------------------------------------------------------------------------------\n" +
-                $"- PlayerName: {player.Name}\n" +
-                $"# Guid: {player.GUID}\n" +
-                $"# HWID: {player.HWID}   |   IP: {player.IP}\n" +
+                $"-                         PlayerName: {player.Name}\n" +
+                $"# Guid: {player.GUID}                  |   IP: {player.IP}\n" +
+                $"# HWID: {player.HWID}   |   Joined at: {DateTime.Now}\n" +
                 "------------------------------------------------------------------------------\n" +
                 "                - Developed by MRX450#6329\n" +
                 "-```"
